@@ -98,11 +98,12 @@ function LineLayer({
 }
 
 export function MapLayer({ dim = 1 }: { dim?: number }) {
+  const base = import.meta.env.BASE_URL
   return (
     <group>
-      <LineLayer url="/geo/world.geojson" step={1.2} opacity={0.14 * dim} radius={GLOBE_RADIUS * 0.985} />
-      <LineLayer url="/geo/china-provinces.geojson" step={0.6} opacity={0.25 * dim} radius={GLOBE_RADIUS * 0.992} />
-      <LineLayer url="/geo/china-border.geojson" step={0.3} opacity={0.7 * dim} radius={GLOBE_RADIUS * 1.0} />
+      <LineLayer url={`${base}geo/world.geojson`} step={1.2} opacity={0.14 * dim} radius={GLOBE_RADIUS * 0.985} />
+      <LineLayer url={`${base}geo/china-provinces.geojson`} step={0.6} opacity={0.25 * dim} radius={GLOBE_RADIUS * 0.992} />
+      <LineLayer url={`${base}geo/china-border.geojson`} step={0.3} opacity={0.7 * dim} radius={GLOBE_RADIUS * 1.0} />
     </group>
   )
 }

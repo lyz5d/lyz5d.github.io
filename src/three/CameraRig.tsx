@@ -8,7 +8,7 @@ const CAM: Record<Stage, Record<View, { pos: [number, number, number]; look: [nu
   1: { list: { pos: [0, 0, 8], look: [0, 0, 0] }, focus: { pos: [0, 0, 8], look: [0, 0, 0] } },
   2: { list: { pos: [0, 0, 5.4], look: [0, 0, 0] }, focus: { pos: [0, 0, 5.4], look: [0, 0, 0] } },
   3: {
-    list: { pos: [0, 0, 5.6], look: [-0.7, 0, 0] },
+    list: { pos: [0, 0, 4.9], look: [-0.7, 0, 0] },
     focus: { pos: [0, 0.4, 6.0], look: [0, -1.0, 0] },
   },
 }

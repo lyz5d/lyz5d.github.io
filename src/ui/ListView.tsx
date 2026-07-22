@@ -6,8 +6,8 @@ import { globeScreen, pinScreen } from "../three/sharedRefs"
 import { MateCard } from "./Card"
 
 const ANGLE_STEP = 0.23
-const CARD_CLEARANCE = 170 // card circle radius beyond the globe's screen radius
-const SCROLLBAR_GAP = 340 // scrollbar arc radius beyond the globe's screen radius
+const CARD_CLEARANCE = 230 // card circle radius beyond the globe's screen radius
+const SCROLLBAR_GAP = 460 // scrollbar arc radius beyond the globe's screen radius
 const ARC_HALF = 0.42 // scrollbar arc half-span (radians); shorter than the column
 const WARP_MS = 500
 
@@ -330,34 +330,48 @@ export function ListView() {
   return (
     <>
       <div className="search">
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value)
-            updateCursor(e.target.value)
-          }}
-          onFocus={() => {
-            setSearchFocused(true)
-            updateCursor(input)
-          }}
-          onBlur={() => setSearchFocused(false)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setQuery(input)
-              const q = input.trim().toLowerCase()
-              const first = CLASSMATES.find((c) =>
-                (c.lastName + (c.firstName ?? "")).toLowerCase().includes(q),
-              )
-              if (first) requestScroll(first.university, true)
-            }
-          }}
-          placeholder="Search name…"
-          spellCheck={false}
-          aria-label="Search classmates"
-        />
-        {searchFocused && (
-          <span className="cursor-block" style={{ left: cursorLeft }} aria-hidden="true" />
+        {query && people.length > 0 ? (
+          <button
+            className="clear-btn"
+            onClick={() => {
+              setQuery("")
+              setInput("")
+            }}
+          >
+            ✕ CLEAR
+          </button>
+        ) : (
+          <>
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value)
+                updateCursor(e.target.value)
+              }}
+              onFocus={() => {
+                setSearchFocused(true)
+                updateCursor(input)
+              }}
+              onBlur={() => setSearchFocused(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setQuery(input)
+                  const q = input.trim().toLowerCase()
+                  const first = CLASSMATES.find((c) =>
+                    (c.lastName + (c.firstName ?? "")).toLowerCase().includes(q),
+                  )
+                  if (first) requestScroll(first.university, true)
+                }
+              }}
+              placeholder="Search name…"
+              spellCheck={false}
+              aria-label="Search classmates"
+            />
+            {searchFocused && (
+              <span className="cursor-block" style={{ left: cursorLeft }} aria-hidden="true" />
+            )}
+          </>
         )}
       </div>
 

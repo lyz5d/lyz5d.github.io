@@ -3,51 +3,9 @@ import { AnimatePresence, motion } from "framer-motion"
 import { CLASSMATES, TEACHERS } from "../data"
 import type { Classmate, Teacher } from "../data/schema"
 import { useStore } from "../store/useStore"
-import { gateScreen } from "../three/sharedRefs"
 import { nearestCity } from "../utils/city"
 import { artUrl } from "./art"
-import { DotArt } from "./Card"
 import { EASE_OUT, DUR_PERSON } from "./motion"
-
-function GateMarker() {
-  const ref = useRef<HTMLDivElement>(null)
-  const shown = useRef({ x: 0, y: 0, initialized: false })
-
-  useEffect(() => {
-    let raf = 0
-    const loop = () => {
-      raf = requestAnimationFrame(loop)
-      const el = ref.current
-      if (!el) return
-      const s = shown.current
-      if (!s.initialized) {
-        s.x = gateScreen.x
-        s.y = gateScreen.y
-        s.initialized = true
-      }
-      const k = 0.045
-      s.x += (gateScreen.x - s.x) * k
-      s.y += (gateScreen.y - s.y) * k
-      el.style.transform = `translate(-50%, -100%) translate(${s.x}px, ${s.y}px)`
-      el.style.opacity = gateScreen.visible ? "1" : "0"
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  return (
-    <div ref={ref} className="gate-marker" aria-hidden="true">
-      <svg width="44" height="34" viewBox="0 0 44 34" fill="none">
-        <path
-          d="M6.5 32.5 V9.2 M37.5 32.5 V9.4 M3.8 9.5 C14 7.8 30.5 8.3 40.2 9.3 M10.5 16.8 C18 15.9 27 16.1 33.5 16.7"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
-  )
-}
 
 const panelVariants = {
   hidden: {},
@@ -72,19 +30,8 @@ function MatePanel({ c }: { c: Classmate }) {
   const name = c.confidential ? c.lastName : `${c.lastName}${c.firstName ?? ""}`
   const city = !c.confidential && c.lat != null && c.lng != null ? nearestCity(c.lat, c.lng) : null
   return (
-    <motion.div className="info-panel" variants={panelVariants} initial="hidden" animate="show">
-      <motion.div className="info-art" variants={rowVariants}>
-        {c.confidential ? (
-          <div className="card-art redacted">
-            <span>CLASSIFIED</span>
-          </div>
-        ) : url ? (
-          <img className="card-art" src={url} alt="" />
-        ) : (
-          <DotArt id={c.id} />
-        )}
-      </motion.div>
-      <div className="info-body">
+    <motion.div className="focus-motion" variants={panelVariants} initial="hidden" animate="show">
+      <div className="focus-info angle-frame">
         <motion.h2 className="info-name" variants={rowVariants}>
           {name}
         </motion.h2>
@@ -103,14 +50,22 @@ function MatePanel({ c }: { c: Classmate }) {
           </Row>
         </dl>
       </div>
+      {url && (
+        <motion.img
+          className="focus-art"
+          src={url}
+          alt=""
+          variants={rowVariants}
+        />
+      )}
     </motion.div>
   )
 }
 
 function TeacherPanel({ t }: { t: Teacher }) {
   return (
-    <motion.div className="info-panel teacher-panel" variants={panelVariants} initial="hidden" animate="show">
-      <div className="info-body">
+    <motion.div className="focus-motion" variants={panelVariants} initial="hidden" animate="show">
+      <div className="focus-info angle-frame">
         <motion.h2 className="info-name" variants={rowVariants}>
           {t.name}
           {t.isHead && <span className="tag">HEAD</span>}
@@ -204,21 +159,19 @@ export function FocusView() {
   const safeIndex = Math.min(index, list.length - 1)
   const item = list[safeIndex] as Classmate | Teacher
   const isMate = mode === "mates"
-  const mate = item as Classmate
-  const showGate = isMate && !mate.confidential && mate.lat != null
 
   return (
     <div className="focus-view">
       <AnimatePresence mode="wait">
         <motion.div
           key={item.id}
-          className="focus-motion"
+          className="focus-anim"
           initial={{ opacity: 0, y: 40, filter: "blur(3px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: -28, filter: "blur(3px)" }}
           transition={{ duration: DUR_PERSON, ease: EASE_OUT }}
         >
-          {isMate ? <MatePanel c={mate} /> : <TeacherPanel t={item as Teacher} />}
+          {isMate ? <MatePanel c={item as Classmate} /> : <TeacherPanel t={item as Teacher} />}
         </motion.div>
       </AnimatePresence>
 
@@ -232,8 +185,6 @@ export function FocusView() {
           </button>
         )}
       </div>
-
-      {showGate && <GateMarker />}
     </div>
   )
 }

@@ -8,10 +8,6 @@ export const globeScreen = { cx: 0, cy: 0, r: 0, ready: false }
 // Read by Pins for camera-facing fade.
 export const globeWorld = new THREE.Vector3()
 
-// Screen-space target for the 2D gate marker (focus view), updated each frame
-// by GlobeGroup from the focused student's university position.
-export const gateScreen = { x: 0, y: 0, visible: false }
-
 // Screen-space position of the centered university's pin (list view), updated
 // each frame by GlobeGroup; read by ListView to draw the connector line.
 export const pinScreen = { x: 0, y: 0, visible: false }

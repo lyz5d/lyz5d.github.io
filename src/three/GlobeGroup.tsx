@@ -5,10 +5,11 @@ import { useStore } from "../store/useStore"
 import { CLASSMATES } from "../data"
 import { chinaFacingQuaternion, latLngToVec3, GLOBE_RADIUS } from "../utils/geo"
 import { dragState } from "./dragState"
-import { globeScreen, globeWorld, gateScreen, pinScreen } from "./sharedRefs"
-import { Globe } from "./Globe"
+import { globeScreen, globeWorld, pinScreen } from "./sharedRefs"
+import { Globe, GlobeLimb } from "./Globe"
 import { MapLayer } from "./MapLayer"
 import { Pins } from "./Pins"
+import { FocusPin } from "./FocusPin"
 
 const BASE_QUAT = chinaFacingQuaternion()
 const FLY_IN_DURATION = 2.2
@@ -31,21 +32,9 @@ export function GlobeGroup() {
   const stage = useStore((s) => s.stage)
   const view = useStore((s) => s.view)
   const mode = useStore((s) => s.mode)
-  const focusedStudentId = useStore((s) => s.focusedStudentId)
   const centeredUniversity = useStore((s) => s.centeredUniversity)
   const spinAngle = useRef(0)
   const enterAt = useRef<number | null>(null)
-
-  const focusedStudent = useMemo(
-    () =>
-      CLASSMATES.find((c) => c.id === focusedStudentId && !c.confidential) ??
-      CLASSMATES.find((c) => !c.confidential),
-    [focusedStudentId],
-  )
-  const gateLocal = useMemo(
-    () => latLngToVec3(focusedStudent?.lat ?? 35, focusedStudent?.lng ?? 105, GLOBE_RADIUS * 1.004),
-    [focusedStudent],
-  )
 
   const centeredSpot = useMemo(() => {
     const c = CLASSMATES.find((c) => c.university === centeredUniversity && !c.confidential && c.lat != null)
@@ -62,7 +51,7 @@ export function GlobeGroup() {
     const pitch = pitchRef.current
     const spin = spinRef.current
     if (!pos || !orbit || !pitch || !spin) return
-    const k = 1 - Math.pow(0.0008, dt)
+    const k = 1 - Math.pow(0.0005, dt)
 
     let tx = 0
     let ty = 0
@@ -101,9 +90,9 @@ export function GlobeGroup() {
     }
 
     // focus view: pitch the globe forward so the China cluster rises onto the
-    // top limb of the decorative bottom arc, where the 2D gate can walk.
+    // top limb of the decorative bottom arc, where the pin can walk.
     const pitchTarget = stage === 3 && view === "focus" ? -Math.PI / 2 + 0.22 : 0
-    pitch.rotation.x += (pitchTarget - pitch.rotation.x) * (1 - Math.pow(0.004, dt))
+    pitch.rotation.x += (pitchTarget - pitch.rotation.x) * (1 - Math.pow(0.002, dt))
 
     if (!dragState.dragging) {
       dragState.target += (0 - dragState.target) * (1 - Math.pow(0.02, dt))
@@ -137,24 +126,6 @@ export function GlobeGroup() {
     globeScreen.r = (Rw * (h / 2)) / (Math.tan(fov / 2) * d)
     globeScreen.ready = true
 
-    // project the focused university for the 2D gate marker (focus view)
-    if (stage === 3 && view === "focus" && mode === "mates") {
-      tmpGate.copy(gateLocal)
-      spin.localToWorld(tmpGate)
-      tmpToCam.copy(cam.position).sub(globeWorld)
-      const facing = tmpFacing
-        .copy(tmpGate)
-        .sub(globeWorld)
-        .normalize()
-        .dot(tmpToCam.normalize())
-      tmpProjected.copy(tmpGate).project(cam)
-      gateScreen.x = (tmpProjected.x * 0.5 + 0.5) * w
-      gateScreen.y = (-tmpProjected.y * 0.5 + 0.5) * h
-      gateScreen.visible = facing > 0.02 && tmpProjected.z < 1
-    } else {
-      gateScreen.visible = false
-    }
-
     // project the centered university's pin (list view) for the connector line
     if (stage === 3 && view === "list" && pinLocal) {
       tmpGate.copy(pinLocal)
@@ -177,10 +148,12 @@ export function GlobeGroup() {
   if (stage === 1) return null
 
   const showPins = stage === 3 && view === "list"
+  const showFocusPin = stage === 3 && view === "focus" && mode === "mates"
   const dim = stage === 3 && view === "focus" ? 0.5 : 1
 
   return (
     <group ref={posRef} scale={0.0001}>
+      <GlobeLimb dim={dim} />
       <group ref={orbitRef}>
         <group ref={pitchRef}>
           <group quaternion={BASE_QUAT}>
@@ -188,6 +161,7 @@ export function GlobeGroup() {
               <Globe dim={dim} />
               <MapLayer dim={dim} />
               {showPins && <Pins />}
+              {showFocusPin && <FocusPin />}
             </group>
           </group>
         </group>

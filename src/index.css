@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Noto+Serif+SC:wght@400;600;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Serif+SC:wght@400;600;900&display=swap");
 
 :root {
   --bg: #000000;
@@ -6,7 +6,6 @@
   --dim: rgba(255, 255, 255, 0.45);
   --ghost: rgba(255, 255, 255, 0.28);
   --mono: "Share Tech Mono", ui-monospace, monospace;
-  --display: "Orbitron", var(--mono);
   --serif-cjk: "Noto Serif SC", "Songti SC", "SimSun", serif;
 }
 
@@ -59,8 +58,8 @@ body,
   z-index: 100;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, 0.62) 100%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.042) 0 1px, transparent 1px 3px);
+    radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.7) 100%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.065) 0 1.5px, transparent 1.5px 4px);
 }
 
 .app canvas {
@@ -98,10 +97,9 @@ body,
   left: 0;
   transform: translateY(-58%);
   margin: 0;
-  font-family: var(--display);
-  font-weight: 900;
+  font-family: var(--mono);
   font-size: clamp(2.4rem, 7.2vw, 6.4rem);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   line-height: 1.08;
   mix-blend-mode: difference;
   z-index: 5;
@@ -246,6 +244,24 @@ body,
 .search:hover input,
 .search:focus-within input {
   border-bottom-color: var(--fg);
+}
+.clear-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--dim);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  padding: 0.5rem 0;
+  text-align: left;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.2s;
+}
+.clear-btn:hover {
+  border-bottom-color: var(--fg);
+  animation: btn-glitch 0.14s steps(2) 1;
 }
 .search:focus-within input::placeholder {
   color: var(--ghost);
@@ -453,44 +469,37 @@ body,
   z-index: 4;
   pointer-events: none;
 }
+.focus-anim,
 .focus-motion {
   position: absolute;
-  left: 50%;
-  top: 37%;
-  transform: translate(-50%, -50%);
-  pointer-events: auto;
+  inset: 0;
 }
-.info-panel {
-  display: flex;
-  align-items: stretch;
-  gap: 2.2rem;
-  border: 1px solid var(--fg);
-  background: rgba(0, 0, 0, 0.72);
-  padding: 2rem 2.4rem;
-  min-width: 620px;
-  max-width: 76vw;
+.focus-motion {
+  pointer-events: none;
+}
+.focus-info {
+  position: absolute;
+  left: 8vw;
+  top: 34%;
+  pointer-events: auto;
   text-align: left;
 }
-.teacher-panel {
-  min-width: 420px;
-  justify-content: center;
-  text-align: center;
+.angle-frame {
+  padding: 22px 26px;
+  background:
+    linear-gradient(var(--fg), var(--fg)) top left / 16px 1px,
+    linear-gradient(var(--fg), var(--fg)) top left / 1px 16px,
+    linear-gradient(var(--fg), var(--fg)) bottom right / 16px 1px,
+    linear-gradient(var(--fg), var(--fg)) bottom right / 1px 16px;
+  background-repeat: no-repeat;
 }
-.info-art {
-  display: flex;
-  align-items: center;
-}
-.info-art .card-art,
-.info-art .dot-art {
-  width: 220px;
-  height: 220px;
-  margin: 0;
-}
-.info-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 300px;
+.focus-art {
+  position: absolute;
+  right: 6vw;
+  bottom: 10vh;
+  width: min(300px, 28vw);
+  display: block;
+  pointer-events: none;
 }
 .info-name {
   font-family: var(--serif-cjk);
@@ -562,61 +571,14 @@ dd.ghost .quote-text {
   margin: 0;
 }
 
-/* ---- 2D gate marker ---- */
-.gate-marker {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 5;
-  color: var(--fg);
-  pointer-events: none;
-  transition: opacity 0.3s;
-  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.9));
-}
-
-/* ---- art ---- */
-.card-art {
-  width: 140px;
-  height: 140px;
-  border: 1px solid currentColor;
-  display: block;
-  object-fit: contain;
-}
-.dot-art {
-  width: 140px;
-  height: 140px;
-  border: 1px solid currentColor;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(7, 1fr);
-  gap: 2px;
-  padding: 10px;
-}
-.dot-art span {
-  background: transparent;
-}
-.dot-art span.on {
-  background: currentColor;
-}
-.card-art.redacted {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
-  opacity: 0.7;
-}
-
 /* ---- narrow screens ---- */
 @media (max-width: 760px) {
-  .info-panel {
-    flex-direction: column;
-    align-items: center;
-    min-width: 0;
-    width: 88vw;
-    padding: 1.4rem;
-    gap: 1.2rem;
+  .focus-info {
+    left: 50%;
+    top: 30%;
+    transform: translateX(-50%);
     text-align: center;
+    width: 88vw;
   }
   .info-rows {
     text-align: left;
@@ -625,8 +587,11 @@ dd.ghost .quote-text {
     font-size: 2rem;
     justify-content: center;
   }
-  .focus-motion {
-    top: 34%;
+  .focus-art {
+    right: 50%;
+    transform: translateX(50%);
+    bottom: 12vh;
+    width: min(240px, 60vw);
   }
   .hero-title {
     font-size: clamp(2.6rem, 13vw, 4.5rem);
