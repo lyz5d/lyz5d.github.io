@@ -49,6 +49,7 @@ export function ListView() {
   const consumeScroll = useStore((s) => s.consumeScroll)
   const focusStudent = useStore((s) => s.focusStudent)
   const requestScroll = useStore((s) => s.requestScroll)
+  const focusedStudentId = useStore((s) => s.focusedStudentId)
 
   const [input, setInput] = useState("")
   const [searchFocused, setSearchFocused] = useState(false)
@@ -115,6 +116,20 @@ export function ListView() {
     centeredRef.current = -1
     setCenteredUniversity(peopleRef.current[0]?.university ?? null)
   }, [query, setCenteredUniversity])
+
+  // returning from focus view: land on the person you were just reading
+  // (this component unmounts while in focus view, so refs restart at 0)
+  useEffect(() => {
+    if (stage !== 3 || view !== "list") return
+    const idx = peopleRef.current.findIndex((c) => c.id === focusedStudentId)
+    if (idx > 0) {
+      currentRef.current = idx
+      targetRef.current = idx
+      centeredRef.current = -1 // force the centered update to fire once
+    }
+    // mount-time only: view flips to "list" exactly when this remounts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (!scrollTarget) return
