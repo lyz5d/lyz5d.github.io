@@ -21,7 +21,7 @@ html[data-theme="light"] .app canvas {
 }
 html[data-theme="light"] .crt {
   background:
-    radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.22) 100%),
+    radial-gradient(ellipse at center, transparent 50%, rgba(255, 255, 255, 0.7) 100%),
     repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0 1.5px, transparent 1.5px 4px);
 }
 html[data-theme="light"] .atmosphere {
@@ -241,7 +241,7 @@ body,
 .theme-wipe {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: 110; /* above .crt (100): the vignette is content too */
   backdrop-filter: invert(1);
 }
 .theme-wipe-line {
