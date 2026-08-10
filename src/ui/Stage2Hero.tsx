@@ -44,7 +44,11 @@ export function Stage2Hero() {
             <Decode text="WE ARE NOW" pad={10} delay={0.75} duration={1.3} />
           </h1>
           <p className="hero-sub">
-            <Decode text="50 PEOPLE · ONE CLASS · SCATTERED ACROSS THE MAP" delay={1.4} duration={1.4} />
+            <Decode
+              text={`${CLASSMATES.length} PEOPLE · ONE CLASS · SCATTERED ACROSS THE MAP`}
+              delay={1.4}
+              duration={1.4}
+            />
           </p>
           <motion.div
             initial={{ opacity: 0, y: 14 }}

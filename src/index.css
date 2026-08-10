@@ -473,15 +473,14 @@ body,
 .focus-anim,
 .focus-motion {
   position: absolute;
-  inset: 0;
-}
-.focus-motion {
+  left: 8vw;
+  top: 34%;
+  display: flex;
+  align-items: center;
+  gap: 4vw;
   pointer-events: none;
 }
 .focus-info {
-  position: absolute;
-  left: 8vw;
-  top: 34%;
   pointer-events: auto;
   text-align: left;
 }
@@ -495,18 +494,15 @@ body,
   background-repeat: no-repeat;
 }
 .focus-art {
-  position: absolute;
-  right: 6vw;
-  bottom: 10vh;
-  width: min(300px, 28vw);
-  display: block;
+  width: min(340px, 30vw);
+  flex: none;
   pointer-events: none;
 }
 .info-name {
-  font-family: var(--display-cjk);
-  font-weight: 400;
+  font-family: var(--sans-cjk);
+  font-weight: 900;
   font-size: 2.6rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   margin: 0;
   display: flex;
   align-items: center;
@@ -574,12 +570,17 @@ dd.ghost .quote-text {
 
 /* ---- narrow screens ---- */
 @media (max-width: 760px) {
-  .focus-info {
+  .focus-motion {
     left: 50%;
     top: 30%;
     transform: translateX(-50%);
-    text-align: center;
+    flex-direction: column;
+    gap: 24px;
     width: 88vw;
+  }
+  .focus-info {
+    width: 100%;
+    text-align: center;
   }
   .info-rows {
     text-align: left;
@@ -589,9 +590,6 @@ dd.ghost .quote-text {
     justify-content: center;
   }
   .focus-art {
-    right: 50%;
-    transform: translateX(50%);
-    bottom: 12vh;
     width: min(240px, 60vw);
   }
   .hero-title {

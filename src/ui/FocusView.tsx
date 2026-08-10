@@ -4,7 +4,8 @@ import { CLASSMATES, TEACHERS } from "../data"
 import type { Classmate, Teacher } from "../data/schema"
 import { useStore } from "../store/useStore"
 import { nearestCity } from "../utils/city"
-import { artUrl } from "./art"
+import { artRaw } from "./art"
+import { Art } from "./Art"
 import { EASE_OUT, DUR_PERSON } from "./motion"
 
 const panelVariants = {
@@ -26,7 +27,7 @@ function Row({ label, ghost, children }: { label: string; ghost?: boolean; child
 }
 
 function MatePanel({ c }: { c: Classmate }) {
-  const url = c.confidential ? null : artUrl(c.id)
+  const raw = c.confidential ? null : artRaw(c.id)
   const name = c.confidential ? c.lastName : `${c.lastName}${c.firstName ?? ""}`
   const city = !c.confidential && c.lat != null && c.lng != null ? nearestCity(c.lat, c.lng) : null
   return (
@@ -50,14 +51,7 @@ function MatePanel({ c }: { c: Classmate }) {
           </Row>
         </dl>
       </div>
-      {url && (
-        <motion.img
-          className="focus-art"
-          src={url}
-          alt=""
-          variants={rowVariants}
-        />
-      )}
+      {raw && <Art raw={raw} />}
     </motion.div>
   )
 }

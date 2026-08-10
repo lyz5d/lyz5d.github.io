@@ -1,7 +1,12 @@
 import type { Teacher } from "./schema"
-import { CLASSMATES } from "./classmates"
+import { CLASSMATES as REAL_CLASSMATES } from "./classmates"
+import { FAKE_CLASSMATES } from "./demo"
 
-export { CLASSMATES }
+// ?demo in the URL swaps the roster for the privacy-safe fake list
+// (screen recording). Decided once at module init; every consumer imports
+// CLASSMATES from here, so no call site changes.
+export const IS_DEMO = new URLSearchParams(window.location.search).has("demo")
+export const CLASSMATES = IS_DEMO ? FAKE_CLASSMATES : REAL_CLASSMATES
 
 // 6 teachers; head teacher first.
 export const TEACHERS: Teacher[] = [
