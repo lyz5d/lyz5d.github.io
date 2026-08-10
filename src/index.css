@@ -244,6 +244,11 @@ body,
   z-index: 110; /* above .crt (100): the vignette is content too */
   backdrop-filter: invert(1);
 }
+html.theme-flip *,
+html.theme-flip *::before,
+html.theme-flip *::after {
+  transition: none !important;
+}
 .theme-wipe-line {
   position: absolute;
   top: 0;

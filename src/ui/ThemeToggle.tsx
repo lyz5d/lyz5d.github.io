@@ -24,6 +24,9 @@ export function ThemeToggle() {
     if (lineColor) return
     // line in the OLD theme's fg: visible against the un-scanned area
     setLineColor(theme === "dark" ? "#ffffff" : "#000000")
+    // suppress color cross-fades: at the flip everything must snap at once,
+    // or transitioning elements (buttons, borders) fade and read as flicker
+    document.documentElement.classList.add("theme-flip")
   }
 
   return (
@@ -37,6 +40,7 @@ export function ThemeToggle() {
           onAnimationComplete={() => {
             toggleTheme() // real flip; inverted-old == new, so it's seamless
             setLineColor(null)
+            document.documentElement.classList.remove("theme-flip")
           }}
         >
           <div
