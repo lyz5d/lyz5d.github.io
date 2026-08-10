@@ -8,10 +8,17 @@ function prepare(raw: string): string {
     .replace(/(<svg[^>]*?)\sheight="[^"]*"/i, "$1")
 }
 
+// sharp attack, long luxurious settle
+const DRAW_EASE = "cubic-bezier(0.7, 0, 0.16, 1)"
+const FIRST_DELAY = 450 // let the info rows land first
+const STAGGER = 140 // head-to-tail cascade; heavy overlap since strokes run 1.1-2s
+
 type Eye = {
   ball: SVGEllipseElement
-  cx: number
-  cy: number
+  hx: number // pupil home (as drawn: resting top-left of the socket)
+  hy: number
+  sx: number // socket center
+  sy: number
   maxX: number
   maxY: number
   cur: { x: number; y: number }
@@ -32,40 +39,38 @@ export function Art({ raw }: { raw: string }) {
 
     const anims: Animation[] = []
 
-    // trim-path draw-on: every unfilled stroked shape draws itself,
-    // staggered in document order like a hand sketching
+    // trim-path draw-on: document order (head -> tail), starts staggered but
+    // each stroke runs long, so several are always mid-draw at once
     const shapes = Array.from(svg.querySelectorAll<SVGGeometryElement>("path, ellipse, circle"))
     const stroked = shapes.filter((el) => el.style.fill === "none")
     const filled = shapes.filter((el) => el.style.fill !== "none")
-    let delay = 450 // let the info rows land first
-    for (const el of stroked) {
+    stroked.forEach((el, i) => {
       const len = el.getTotalLength()
       el.setAttribute("pathLength", "100")
       el.style.strokeDasharray = "100"
       el.style.strokeDashoffset = "100"
-      const dur = Math.min(900, Math.max(320, len * 2.2))
+      const dur = Math.min(2000, Math.max(1100, 900 + len * 4))
       anims.push(
         el.animate([{ strokeDashoffset: "100" }, { strokeDashoffset: "0" }], {
           duration: dur,
-          delay,
-          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          delay: FIRST_DELAY + i * STAGGER,
+          easing: DRAW_EASE,
           fill: "both",
         }),
       )
-      delay += 70 + dur * 0.35 // overlap: next stroke starts before this one ends
-    }
-    // filled shapes (eyeballs, nose) can't trim; they fade in last
-    for (const el of filled) {
+    })
+    // filled shapes (pupils, nose) can't trim; the "eyes open" near the end
+    const fillStart = FIRST_DELAY + stroked.length * STAGGER * 0.7
+    filled.forEach((el, i) => {
       anims.push(
         el.animate([{ opacity: "0" }, { opacity: "1" }], {
-          duration: 420,
-          delay,
+          duration: 800,
+          delay: fillStart + i * 150,
           easing: "ease-out",
           fill: "both",
         }),
       )
-      delay += 120
-    }
+    })
 
     // eyeball cursor tracking (only when the drawing names its eyes)
     const socketL = svg.querySelector<SVGEllipseElement>("#eye-left")
@@ -76,8 +81,10 @@ export function Art({ raw }: { raw: string }) {
     if (socketL && socketR && ballL && ballR) {
       const mk = (s: SVGEllipseElement, b: SVGEllipseElement): Eye => ({
         ball: b,
-        cx: Number(s.getAttribute("cx")),
-        cy: Number(s.getAttribute("cy")),
+        hx: Number(b.getAttribute("cx")),
+        hy: Number(b.getAttribute("cy")),
+        sx: Number(s.getAttribute("cx")),
+        sy: Number(s.getAttribute("cy")),
         maxX: (Number(s.getAttribute("rx")) - Number(b.getAttribute("rx"))) * 0.7,
         maxY: (Number(s.getAttribute("ry")) - Number(b.getAttribute("ry"))) * 0.7,
         cur: { x: 0, y: 0 },
@@ -95,19 +102,20 @@ export function Art({ raw }: { raw: string }) {
         if (pointer) {
           const rect = svg.getBoundingClientRect()
           const scale = rect.width / vb.width // height auto => uniform scale
+          const px = (pointer.x - rect.left) / scale + vb.x
+          const py = (pointer.y - rect.top) / scale + vb.y
           for (const eye of eyes) {
-            const sx = rect.left + (eye.cx - vb.x) * scale
-            const sy = rect.top + (eye.cy - vb.y) * scale
-            let dx = (pointer.x - sx) / scale
-            let dy = (pointer.y - sy) / scale
-            // elliptical clamp: pupils stay inside their sockets
+            // clamp the gaze target inside the socket ellipse, then express
+            // it as a translation from the pupil's drawn home position
+            let dx = px - eye.sx
+            let dy = py - eye.sy
             const q = Math.hypot(dx / eye.maxX, dy / eye.maxY)
             if (q > 1) {
               dx /= q
               dy /= q
             }
-            eye.tgt.x = dx
-            eye.tgt.y = dy
+            eye.tgt.x = eye.sx + dx - eye.hx
+            eye.tgt.y = eye.sy + dy - eye.hy
           }
         }
         for (const eye of eyes) {

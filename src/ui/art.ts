@@ -8,13 +8,15 @@ const artModules = import.meta.glob("../art/*.svg", {
 
 // person id -> art file (without extension). One drawing can serve both the
 // real roster and the demo roster.
-const ART_BY_ID: Record<string, string> = {
-  c48: "fox", // 孙安 — owner of the nickname
-  f02: "fox", // 虎离 (demo roster)
+function artFileFor(id: string): string | null {
+  if (id === "c48") return "fox" // 孙安 — owner of the nickname
+  // demo roster: even ids are 虎离 clones
+  if (/^f\d+$/.test(id) && Number(id.slice(1)) % 2 === 0) return "fox"
+  return null
 }
 
 export function artRaw(id: string): string | null {
-  const file = ART_BY_ID[id]
+  const file = artFileFor(id)
   if (!file) return null
   for (const k in artModules) {
     if (k.endsWith("/" + file + ".svg")) return artModules[k]

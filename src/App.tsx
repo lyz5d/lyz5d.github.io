@@ -5,6 +5,7 @@ import { Stage2Hero } from "./ui/Stage2Hero"
 import { ListView } from "./ui/ListView"
 import { FocusView } from "./ui/FocusView"
 import { ClassHud } from "./ui/ClassHud"
+import { ThemeToggle } from "./ui/ThemeToggle"
 import { EASE_IN_OUT, DUR_VIEW } from "./ui/motion"
 import { useStore } from "./store/useStore"
 
@@ -41,6 +42,7 @@ export default function App() {
         )}
       </AnimatePresence>
       <ClassHud />
+      <ThemeToggle />
       <div className="crt" aria-hidden="true" />
     </div>
   )

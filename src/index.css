@@ -5,9 +5,45 @@
   --fg: #ffffff;
   --dim: rgba(255, 255, 255, 0.45);
   --ghost: rgba(255, 255, 255, 0.28);
-  --mono: "Share Tech Mono", ui-monospace, monospace;
   --sans-cjk: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   --display-cjk: "ZCOOL QingKe HuangYou", "Noto Sans SC", "PingFang SC", sans-serif;
+}
+
+html[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #000000;
+  --dim: rgba(0, 0, 0, 0.45);
+  --ghost: rgba(0, 0, 0, 0.28);
+}
+html,
+body {
+  transition: background 0.35s ease, color 0.35s ease;
+}
+html[data-theme="light"] .app canvas {
+  filter: invert(1);
+}
+html[data-theme="light"] .crt {
+  background:
+    radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.22) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0 1.5px, transparent 1.5px 4px);
+}
+html[data-theme="light"] .atmosphere {
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.03) 45%, transparent 72%);
+}
+html[data-theme="light"] .arc-track {
+  stroke: rgba(0, 0, 0, 0.15);
+}
+html[data-theme="light"] .arc-thumb {
+  stroke: rgba(0, 0, 0, 0.4);
+}
+html[data-theme="light"] .link-line {
+  stroke: rgba(0, 0, 0, 0.4);
+}
+html[data-theme="light"] .link-node {
+  fill: rgba(0, 0, 0, 0.4);
+}
+html[data-theme="light"] .scrollbar-arc:hover .arc-track {
+  stroke: rgba(0, 0, 0, 0.32);
 }
 
 * {
@@ -199,6 +235,10 @@ body,
   top: 3vh;
   left: 3vw;
   z-index: 6;
+}
+.theme-hud {
+  left: auto;
+  right: 3vw;
 }
 
 /* ---- search ---- */
@@ -473,14 +513,13 @@ body,
 .focus-anim,
 .focus-motion {
   position: absolute;
-  left: 8vw;
-  top: 34%;
-  display: flex;
-  align-items: center;
-  gap: 4vw;
+  inset: 0;
   pointer-events: none;
 }
 .focus-info {
+  position: absolute;
+  left: 8vw;
+  top: 34%;
   pointer-events: auto;
   text-align: left;
 }
@@ -494,8 +533,11 @@ body,
   background-repeat: no-repeat;
 }
 .focus-art {
-  width: min(340px, 30vw);
-  flex: none;
+  position: absolute;
+  right: 7vw;
+  top: 46%;
+  transform: translateY(-50%);
+  width: min(560px, 42vw);
   pointer-events: none;
 }
 .info-name {
@@ -571,15 +613,13 @@ dd.ghost .quote-text {
 /* ---- narrow screens ---- */
 @media (max-width: 760px) {
   .focus-motion {
+    inset: 0;
+  }
+  .focus-info {
     left: 50%;
     top: 30%;
     transform: translateX(-50%);
-    flex-direction: column;
-    gap: 24px;
     width: 88vw;
-  }
-  .focus-info {
-    width: 100%;
     text-align: center;
   }
   .info-rows {
@@ -590,7 +630,11 @@ dd.ghost .quote-text {
     justify-content: center;
   }
   .focus-art {
-    width: min(240px, 60vw);
+    right: 50%;
+    top: auto;
+    bottom: 10vh;
+    transform: translateX(50%);
+    width: min(280px, 62vw);
   }
   .hero-title {
     font-size: clamp(2.6rem, 13vw, 4.5rem);
