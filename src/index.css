@@ -237,6 +237,8 @@ body,
   left: auto;
   top: calc(3vh + 3rem);
   right: 3vw;
+  min-width: 10ch;
+  text-align: center;
 }
 .theme-wipe {
   position: fixed;

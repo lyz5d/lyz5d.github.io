@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
 import { useStore } from "../store/useStore"
 
@@ -15,6 +15,7 @@ export function ThemeToggle() {
   const theme = useStore((s) => s.theme)
   const toggleTheme = useStore((s) => s.toggleTheme)
   const [lineColor, setLineColor] = useState<string | null>(null)
+  const targetRef = useRef<"light" | "dark">("light")
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -22,6 +23,7 @@ export function ThemeToggle() {
 
   const startWipe = () => {
     if (lineColor) return
+    targetRef.current = theme === "dark" ? "light" : "dark"
     // line in the OLD theme's fg: visible against the un-scanned area
     setLineColor(theme === "dark" ? "#ffffff" : "#000000")
     // suppress color cross-fades: at the flip everything must snap at once,
@@ -38,9 +40,18 @@ export function ThemeToggle() {
           animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
           transition={{ duration: WIPE_DURATION, ease: [...WIPE_EASE] }}
           onAnimationComplete={() => {
-            toggleTheme() // real flip; inverted-old == new, so it's seamless
+            // flip synchronously, INSIDE the suppression window: setting
+            // data-theme via the React effect would land a frame late, after
+            // transitions are re-enabled — that was the HUD flicker
+            document.documentElement.dataset.theme = targetRef.current
+            toggleTheme() // keep the store in sync (button label etc.)
             setLineColor(null)
-            document.documentElement.classList.remove("theme-flip")
+            // release suppression after the browser has computed the new vars
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                document.documentElement.classList.remove("theme-flip")
+              })
+            })
           }}
         >
           <div
