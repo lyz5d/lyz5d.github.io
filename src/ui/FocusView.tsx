@@ -87,6 +87,7 @@ export function FocusView() {
   const setFocusedStudentId = useStore((s) => s.setFocusedStudentId)
   const setFocusedTeacher = useStore((s) => s.setFocusedTeacher)
   const backToList = useStore((s) => s.backToList)
+  const backFromTeachers = useStore((s) => s.backFromTeachers)
 
   const [index, setIndex] = useState(0)
   const lastStep = useRef(0)
@@ -179,9 +180,13 @@ export function FocusView() {
         <span className="focus-counter">
           {String(safeIndex + 1).padStart(2, "0")} / {String(list.length).padStart(2, "0")}
         </span>
-        {isMate && (
+        {isMate ? (
           <button className="back-btn" onClick={backToList}>
             ← BACK TO LIST
+          </button>
+        ) : (
+          <button className="back-btn" onClick={backFromTeachers}>
+            ← BACK TO CLASS
           </button>
         )}
       </div>

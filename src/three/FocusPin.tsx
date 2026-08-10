@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { CLASSMATES } from "../data"
@@ -19,15 +19,22 @@ export function FocusPin() {
   const diamondRef = useRef<THREE.Mesh>(null)
   const initialized = useRef(false)
 
+  // strictly the focused student; confidential / missing -> no pin at all
   const student = useMemo(
-    () =>
-      CLASSMATES.find((c) => c.id === focusedId && !c.confidential) ??
-      CLASSMATES.find((c) => !c.confidential),
+    () => CLASSMATES.find((c) => c.id === focusedId && !c.confidential && c.lat != null && c.lng != null) ?? null,
     [focusedId],
   )
-  const lat = student?.lat ?? 35
-  const lng = student?.lng ?? 105
+  const lat = student?.lat ?? 0
+  const lng = student?.lng ?? 0
   const target = useMemo(() => latLngToVec3(lat, lng, GLOBE_RADIUS * 1.006), [lat, lng])
+
+  // re-snap only after a null gap (confidential -> valid): the group remounts
+  // at origin, and a stale `initialized` would lerp the pin from 0,0,0
+  const hadStudent = useRef(false)
+  useEffect(() => {
+    if (student && !hadStudent.current) initialized.current = false
+    hadStudent.current = student != null
+  }, [student])
 
   useFrame((state, dt) => {
     const g = groupRef.current
@@ -48,6 +55,8 @@ export function FocusPin() {
       ;(diamondRef.current.material as THREE.MeshBasicMaterial).opacity = twinkle
     }
   })
+
+  if (!student) return null
 
   return (
     <group ref={groupRef}>

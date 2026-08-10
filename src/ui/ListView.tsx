@@ -139,7 +139,10 @@ export function ListView() {
   }, [scrollTarget, consumeScroll])
 
   useEffect(() => {
-    if (stage !== 3) return
+    // gate on view too: this component stays mounted during the exit
+    // crossfade while FocusView is already listening — without the gate one
+    // wheel tick would scroll the departing list AND step the person
+    if (stage !== 3 || view !== "list") return
     const onWheel = (e: WheelEvent) => {
       if (warpRef.current) return
       targetRef.current += e.deltaY * 0.0008
@@ -176,7 +179,7 @@ export function ListView() {
       window.removeEventListener("touchstart", onTouchStart)
       window.removeEventListener("touchmove", onTouchMove)
     }
-  }, [stage])
+  }, [stage, view])
 
   // curved scrollbar drag: pointer angle -> list position (shortest path)
   useEffect(() => {
@@ -371,10 +374,13 @@ export function ListView() {
               onBlur={() => setSearchFocused(false)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
+                  const q = input.trim()
+                  if (!q) return // empty search: do nothing
                   setQuery(input)
-                  const q = input.trim().toLowerCase()
+                  // jump only on a name hit; university matches just filter the list
+                  const ql = q.toLowerCase()
                   const first = CLASSMATES.find((c) =>
-                    (c.lastName + (c.firstName ?? "")).toLowerCase().includes(q),
+                    (c.lastName + (c.firstName ?? "")).toLowerCase().includes(ql),
                   )
                   if (first) requestScroll(first.university, true)
                 }
