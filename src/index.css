@@ -246,13 +246,9 @@ body,
 .theme-wipe-line {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   width: 2px;
   height: 100%;
-}
-.theme-wipe-line.trailing {
-  right: auto;
-  left: 0;
 }
 
 /* ---- search ---- */
