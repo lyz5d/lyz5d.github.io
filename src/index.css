@@ -5,6 +5,7 @@
   --fg: #ffffff;
   --dim: rgba(255, 255, 255, 0.45);
   --ghost: rgba(255, 255, 255, 0.28);
+  --mono: "Share Tech Mono", ui-monospace, monospace;
   --sans-cjk: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   --display-cjk: "ZCOOL QingKe HuangYou", "Noto Sans SC", "PingFang SC", sans-serif;
 }
@@ -14,10 +15,6 @@ html[data-theme="light"] {
   --fg: #000000;
   --dim: rgba(0, 0, 0, 0.45);
   --ghost: rgba(0, 0, 0, 0.28);
-}
-html,
-body {
-  transition: background 0.35s ease, color 0.35s ease;
 }
 html[data-theme="light"] .app canvas {
   filter: invert(1);
@@ -238,7 +235,24 @@ body,
 }
 .theme-hud {
   left: auto;
+  top: calc(3vh + 3rem);
   right: 3vw;
+}
+.theme-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+.theme-wipe-line {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+}
+.theme-wipe-line.trailing {
+  right: auto;
+  left: 0;
 }
 
 /* ---- search ---- */
@@ -539,6 +553,7 @@ body,
   transform: translateY(-50%);
   width: min(560px, 42vw);
   pointer-events: none;
+  color: var(--fg);
 }
 .info-name {
   font-family: var(--sans-cjk);

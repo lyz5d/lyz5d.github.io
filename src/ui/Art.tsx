@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef } from "react"
 
-// white-on-black inversion + strip fixed size so the svg scales to its box
+// recolor via currentColor so the art follows the theme (light/dark),
+// and strip fixed size so the svg scales to its box
 function prepare(raw: string): string {
   return raw
-    .replace(/#000000/gi, "#ffffff")
+    .replace(/#000000/gi, "currentColor")
     .replace(/(<svg[^>]*?)\swidth="[^"]*"/i, "$1")
     .replace(/(<svg[^>]*?)\sheight="[^"]*"/i, "$1")
 }
