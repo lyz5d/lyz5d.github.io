@@ -242,11 +242,12 @@ body,
   position: fixed;
   inset: 0;
   z-index: 90;
+  backdrop-filter: invert(1);
 }
 .theme-wipe-line {
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   width: 2px;
   height: 100%;
 }
